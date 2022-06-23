@@ -18,5 +18,5 @@ Route::get('/', function () {
 });
 
 Route::get('/getvalist','Api\Payment\XenditController@getVaList');
-Route::get('/createva','Api\Payment\XenditController@createVa');
+Route::post('/invoice','Api\Payment\XenditController@createVa');
 

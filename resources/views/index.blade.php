@@ -34,11 +34,79 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    ...
+                    <div id="before">
+                        <div class="input-group mb-3">
+                            <select class="custom-select" id="paket">
+                                <option selected value="">Pilih Paket</option>
+                                <option value="50000">SUPER</option>
+                                <option value="100000">SUPERDUPER</option>
+                                <!-- <option value="3"></option> -->
+                            </select>
+                            <div class="input-group-append">
+                                <label class="input-group-text" for="carabayar">Option</label>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <select class="custom-select" id="mode">
+                                <option selected value="">Pilih Metode Pembayaran</option>
+                                <option value="1">VA</option>
+                                <option value="2">Transfer</option>
+                                <!-- <option value="3"></option> -->
+                            </select>
+                            <div class="input-group-append">
+                                <label class="input-group-text" for="carabayar">Option</label>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <select class="custom-select" id="bank">
+                                <option selected value="">Pilih Bank</option>
+                                <option value="BNI">Bank Negara Indonesia</option>
+                                <option value="MANDIRI">Bank Mandiri</option>
+                                <option value="PERMATA">Bank Permata</option>
+                                <option value="SAHABAT_SAMPOERNA">Bank Sahabat Sampoerna</option>
+                                <option value="BRI">Bank Rakyat Indonesia</option>
+                                <option value="BSI">Bank Syariah Indonesia</option>
+                                <option value="BJB">Bank Jabar Banten</option>
+                                <option value="DBS">DBS</option>
+                                <!-- <option value="3"></option> -->
+                            </select>
+                            <div class="input-group-append">
+                                <label class="input-group-text" for="carabayar">Option</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="after">
+                <div class="col-12">
+                    <p class="lead">INVOICE</p>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th style="width:50%">Subtotal:</th>
+                                    <td id="total-invoice"></td>
+                                </tr>
+                                <tr>
+                                    <th>Nama:</th>
+                                    <td id="nama-invoice"></td>
+                                </tr>
+                                <tr>
+                                    <th>Nomor VA:</th>
+                                    <td id="akun-invoice"></td>
+                                </tr>
+                                <tr>
+                                    <th>Berakhir pada :</th>
+                                    <td id="expired-invoice"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    <button type="button" class="btn btn-secondary before" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary after" data-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary before" id="tbl-bayar" onclick="bayar()">Bayar</button>
                 </div>
                 </div>
             </div>
@@ -57,14 +125,72 @@
 			</footer>
             
 		<!-- Scripts -->
+            <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 			<script src="assets/js/main.js"></script>
             <script>
-                function modal1(){
-                    var a = $("#nama").val()
-                        if(a != ""){
-                            $("#text-header1").html("Halooo " + a);
-                            $("#modal1").modal("show")
+                function reqbayar(){
+                    $.ajax({
+                        url: "{{url('/invoice')}}" ,
+                        type: "post",
+                        data: {
+                            "paket": $("#paket").val(),
+                            "nama" : a,
+                            "mode": $("#mode").val(),
+                            "bank": $("#bank").val(),
+                            "_token": "{{ csrf_token() }}",
+
+                            },
+                        success: function(data) {
+                            if(data.status == "success"){
+                                $(".before").hide()
+                                $(".after").show()
+                                $("#before").hide()
+                                $("#after").show()
+                                $("#total-invoice").html(data.data.expected_amount)
+                                $("#nama-invoice").html(data.data.name)
+                                $("#akun-invoice").html(data.data.account_number)
+                                $("#expired-invoice").html(data.data.expiration_date)
+                            }else{
+                                console.log('gagal')
+                                return false
+                            }
+                        },
+                        error: function(data) { 
+                            console.log(data)
                         }
+                    });
+                }
+                function bayar(){
+                    // console.log($("#paket").val())
+                    // console.log($("#mode").val())
+                    // console.log($("#bank").val())
+                    if($("#paket").val() != "" && $("#mode").val() != "" && $("#bank").val() != ""){
+                        swal({
+                            title: "Konfirmasi",
+                            text: "Apakah yakin ingin melakukan pembayaran?",
+                            icon: "warning",
+                            buttons: true,
+                            // dangerMode: true,
+                        })
+                        .then((willDelete) => {
+                            if (willDelete) {
+                                reqbayar()
+                            } else {
+                                // swal("Your imaginary file is safe!");
+                                return false;
+                            }
+                        });
+                    }
+                } 
+                var a = "";
+                function modal1(){
+                    $("#after").hide()
+                    $(".after").hide()
+                    a = $("#nama").val()
+                    if(a != ""){
+                        $("#text-header1").html("Halooo " + a);
+                        $("#modal1").modal("show")
+                    }
                 }
                 $(document).ready(function() {
                     $.ajaxSetup({   
