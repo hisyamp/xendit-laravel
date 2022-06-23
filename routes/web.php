@@ -16,3 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('index');
 });
+
+Route::get('/getvalist','Api\Payment\XenditController@getVaList');
+Route::get('/createva','Api\Payment\XenditController@createVa');
+
