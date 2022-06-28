@@ -41,4 +41,25 @@ class XenditController extends Controller
             "data" => $createVA
         ])->setStatusCode(200);
     }
+
+    public function createQr(Request $request){
+        date_default_timezone_set('Asia/Jakarta');
+        // dd(Carbon::now()->addDays(1));
+        Xendit::setApiKey($this->token);
+        $params = [
+            "external_id" => \uniqid(),
+            "type" => "DINAMIC",
+            "expected_amount" => 50000,
+            // "callback_url" => ,
+            "expiration_date" => Carbon::now()->addDays(1),
+            "is_single_use" => true
+        ];
+
+        $createVA = \Xendit\QRCode::create($params);
+
+        return response()->json([
+            "status" => "success",
+            "data" => $createVA
+        ])->setStatusCode(200);
+    }
 }
